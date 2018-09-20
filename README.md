@@ -4,6 +4,7 @@
 比如简化的 behaviour tree, astar pathfinding 等
 
 
+Behaviour Tree
 ```typescript
         let prl = new BehaveParallel()
         // 只执行一轮的序列 (无限执行不传参即可)
@@ -37,4 +38,17 @@
             }
             // runner2.update(Laya.timer.delta)
         })
+```
+
+Request
+```typescript
+// 发起GET请求 (payload会转换成url的一部分)
+HttpRequest.GET("http://127.0.0.1/", {
+    data1: "test", 
+    data2: 123, 
+}, (status, res) => {
+    console.log("GET", status, res)
+}).timeout(3)
+
+// HttpRequest.POST/FORM 接口与 GET 方式一致
 ```
