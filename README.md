@@ -42,13 +42,14 @@ Behaviour Tree
 
 Request
 ```typescript
+HttpRequest.sharedBaseUrl = "https://yourdomain"
 // 发起GET请求 (payload会转换成url的一部分)
-HttpRequest.GET("http://127.0.0.1/", {
+HttpRequest.GET("/your/api/path", {
     data1: "test", 
     data2: 123, 
 }, (status, res) => {
     console.log("GET", status, res)
 }).timeout(3)
 
-// HttpRequest.POST/FORM 接口与 GET 方式一致
+// POST/FORM 接口与 GET 方式一致
 ```
