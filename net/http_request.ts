@@ -24,16 +24,25 @@ class HttpRequest {
         return this._done
     }
 
-    static URL(url: string, query?: any) {
-        if (!!query) {
+    // 将json对象转为 key=val 形式的 query 参数
+    static QUERY(payload?: any) {
+        if (!!payload) {
             let str = ''
-            for (let key in query) {
+            for (let key in payload) {
                 if (str.length > 0) {
                     str += '&'
                 }
-                str += `${key}=${encodeURIComponent(query[key])}`
+                str += `${key}=${encodeURIComponent(payload[key])}`
             }
-            return `${url}?${str}`
+            return str
+        }
+    }
+
+    // 拼接 url 与 query 参数
+    static URL(url: string, payload?: any) {
+        let query = this.QUERY(payload)
+        if (!!query) {
+            return `${url}?${query}`
         }
         return url
     }
