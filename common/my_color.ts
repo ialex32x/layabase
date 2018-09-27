@@ -3,7 +3,7 @@ class MyColor {
     g = 0
     b = 0
 
-    constructor(r: number, g: number, b: number) {
+    constructor(r: number = 0, g: number = 0, b: number = 0) {
         this.r = MathUtil.clamp(Math.ceil(r), 0, 255)
         this.g = MathUtil.clamp(Math.ceil(g), 0, 255)
         this.b = MathUtil.clamp(Math.ceil(b), 0, 255)
@@ -17,6 +17,10 @@ class MyColor {
     // 十六进制颜色值形式返回
     toString() {
         return Laya.Utils.toHexColor((this.r << 16 & 0xff0000) | (this.g << 8 & 0x00ff00) | (this.b & 0xff))
+    }
+
+    static random() {
+        return new MyColor(Math.random() * 255, Math.random() * 255, Math.random() * 255)
     }
 
     // 十六进制颜色转 MyColor
