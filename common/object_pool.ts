@@ -3,7 +3,13 @@ interface IPool<T> {
     dealloc(obj: T);
 }
 
-class ObjectPool<T> implements IPool<T> {
+interface RefCountObject {
+    retain()
+    release()
+}
+
+class ObjectPool<T extends RefCountObject> implements IPool<T> {
+    private count = 0
     private objects = new Array<T>()
     ctor: (pool: IPool<T>) => T
     initer: (obj: T) => void
@@ -14,7 +20,7 @@ class ObjectPool<T> implements IPool<T> {
         return new ctor(this)
     }
 
-    constructor(limit: number, ctor: (pool: IPool<T>) => T, initer: (obj: T) => void) {
+    constructor(limit: number, ctor: (pool: IPool<T>) => T, initer?: (obj: T) => void) {
         this.ctor = ctor
         this.initer = initer
         this.limit = limit
@@ -24,14 +30,24 @@ class ObjectPool<T> implements IPool<T> {
         let cs = this.objects.pop()
         if (!cs) {
             cs = this.ctor(this)
+        } else {
+            cs.retain()
         }
-        this.initer(cs)
+        if (!!this.initer) {
+            this.initer(cs)
+        }
+        this.count++
         return cs
     }
 
     dealloc(cs: T) {
+        this.count--
         if (this.objects.length < this.limit) {
             this.objects.push(cs)
         }
+    }
+
+    print() {
+        console.log("object pool", this.objects.length, this.count)
     }
 }
