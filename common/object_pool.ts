@@ -15,6 +15,7 @@ class ObjectPool<T extends RefCountObject> implements IPool<T> {
     initer: (obj: T) => void
     corner: number
     limit: number
+    name: string
 
     create(ctor: { new (pool): T }) {
         return new ctor(this)
@@ -48,6 +49,10 @@ class ObjectPool<T extends RefCountObject> implements IPool<T> {
     }
 
     print() {
-        console.log("object pool", this.objects.length, this.count)
+        let title = "object pool @"
+        if (!!this.name) {
+            title += this.name + ":"
+        }
+        console.log(title, this.objects.length, this.count)
     }
 }
