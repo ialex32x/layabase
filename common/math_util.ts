@@ -32,4 +32,8 @@ class MathUtil {
         if (v > t) return t
         return v
     }
+
+    static rand(items: any[]) {
+        return items[Math.floor(Math.random() * (items.length - 0.1))]
+    }
 }
