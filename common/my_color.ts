@@ -15,8 +15,12 @@ class MyColor {
     }
 
     // 十六进制颜色值形式返回
-    toString() {
+    hex() {
         return Laya.Utils.toHexColor((this.r << 16 & 0xff0000) | (this.g << 8 & 0x00ff00) | (this.b & 0xff))
+    }
+
+    toString() {
+        return this.hex()
     }
 
     static from256(r: number = 0, g: number = 0, b: number = 0) {
