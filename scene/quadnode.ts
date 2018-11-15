@@ -32,11 +32,29 @@ class QuadNode<T extends QuadNodeObject> {
         // Laya.stage.addChild(sprite)
     }
 
+    findNearest(x: number, y: number, radius: number, filter: (so: T) => boolean): T {
+        let results = []
+        let bestDist = Infinity
+        let bestObj: T
+        this.find(AABB.fromSphere(x, y, radius), results, filter)
+        for (let i = 0; i < results.length; ++i) {
+            let result = results[i]
+            let dist = MathUtil.mag(result.x, result.y, x, y)
+            if (dist < bestDist) {
+                bestDist = dist
+                bestObj = result
+                // console.log(`include ${result.name}(${result.x},${result.y}) dist ${dist}`)
+            }
+            //     list += (`${results[i].name} at ${results[i].x},${results[i].y} in ${results[i].node.id}, `)
+        }
+        return bestObj
+    }
+
     find(box: AABB, results: Array<T>, filter: (so: T) => boolean) {
         if (box.intersect(this.aabb)) {
             for (let i = 0; i < this.objects.length; ++i) {
                 let so = this.objects[i]
-                if (filter(so)) {
+                if (so.aabb.intersect(box) && filter(so)) {
                     results.push(so)
                 }
             }

@@ -59,6 +59,11 @@ class MyColor {
         return new MyColor(MathUtil.lerp(c1.r, c2.r, f), MathUtil.lerp(c1.g, c2.g, f), MathUtil.lerp(c1.b, c2.b, f))
     }
 
+    // 颜色插值
+    static range(c1: MyColor, c2: MyColor) {
+        return new MyColor(MathUtil.lerp(c1.r, c2.r, Math.random()), MathUtil.lerp(c1.g, c2.g, Math.random()), MathUtil.lerp(c1.b, c2.b, Math.random()))
+    }
+
     // 颜色加
     static add(c1: MyColor, c2: MyColor) {
         return new MyColor(c1.r + c2.r, c1.g + c2.g, c1.b + c2.b)
