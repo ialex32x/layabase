@@ -86,6 +86,22 @@ class Vec2 {
         return this
     }
 
+    cross(b: Vec2) {
+        return this.x * b.y - this.y * b.x
+    }
+
+    dot(b: Vec2) {
+        return this.x * b.x + this.y * b.y
+    }
+
+    static cross(a: Vec2, b: Vec2) {
+        return a.x * b.y - a.y * b.x
+    }
+
+    static dot(a: Vec2, b: Vec2) {
+        return a.x * b.x + a.y * b.y
+    }
+
     static rotate(vec: Vec2, radAngle: number) {
         let cos = Math.cos(radAngle)
         let sin = Math.sin(radAngle)
@@ -95,23 +111,12 @@ class Vec2 {
         )
     }
 
-    static angle(v1: Vec2, v2: Vec2) {
-        let len1 = Math.sqrt(v1.x * v1.x + v1.y * v1.y)
-        let len2 = Math.sqrt(v2.x * v2.x + v2.y * v2.y)
-        let m = v1.x * v2.x + v1.y * v2.y
-        let a = Math.acos(m / (len1 * len2))
-        return a
+    angle(v2: Vec2) {
+        return Math.atan2(this.cross(v2), this.dot(v2))
     }
 
-    static signedAngle(v1: Vec2, v2: Vec2) {
-        let len1 = Math.sqrt(v1.x * v1.x + v1.y * v1.y)
-        let len2 = Math.sqrt(v2.x * v2.x + v2.y * v2.y)
-        let p1 = v1.x * v2.x
-        let p2 = v1.y * v2.y
-        let m = p1 + p2
-        let s = p1 - p2
-        let a = Math.acos(m / (len1 * len2))
-        return s > 0 ? a : -a
+    static angle(v1: Vec2, v2: Vec2) {
+        return Math.atan2(v1.cross(v2), v1.dot(v2))
     }
 
     static add(a: Vec2, b: Vec2): Vec2 {
