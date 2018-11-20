@@ -33,11 +33,11 @@ class Transform extends BaseComponent {
         return this._changed
     }
 
-    get x() {
+    get localX() {
         return this._node.x
     }
 
-    get y() {
+    get localY() {
         return this._node.y
     }
 
@@ -49,11 +49,11 @@ class Transform extends BaseComponent {
         return this._node.scaleY
     }
 
-    get position() {
+    get localPosition() {
         return new Laya.Point(this._node.x, this._node.y)
     }
 
-    set position(pos: Laya.Point) {
+    set localPosition(pos: Laya.Point) {
         this._node.pos(pos.x, pos.y)
         this._changed = true
     }
@@ -64,7 +64,7 @@ class Transform extends BaseComponent {
         this._changed = true
     }
 
-    setPosition(x: number, y: number) {
+    setLocalPosition(x: number, y: number) {
         this._node.pos(x, y)
         this._changed = true
     }

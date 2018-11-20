@@ -1,6 +1,10 @@
 class Input {
     static x: number
     static y: number
+    static deltaX: number
+    static deltaY: number
+    static startX: number
+    static startY: number
     static mousepress = false
 
     static init() {
@@ -28,12 +32,20 @@ class Input {
         this.mousepress = true
         this.x = e.stageX
         this.y = e.stageY
+        this.startX = this.x
+        this.startY = this.y
+        this.deltaX = 0
+        this.deltaY = 0
     }
 
     private static onmousemove(e: Laya.Event) {
         if (this.mousepress) {
+            let x = this.x
+            let y = this.y
             this.x = e.stageX
             this.y = e.stageY
+            this.deltaX = this.x - x
+            this.deltaY = this.y - y
         }
     }
 

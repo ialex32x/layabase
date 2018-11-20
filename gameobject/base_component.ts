@@ -2,12 +2,13 @@ interface Component<T> {
     new (go: GameObject): T
 }
 
-class BaseComponent {
+class BaseComponent extends ManagedObject {
     private _destroy: boolean = false
     private _enabled: boolean = true
     private _gameObject: GameObject
 
     constructor(gameObject: GameObject) {
+        super()
         this._gameObject = gameObject
     }
 

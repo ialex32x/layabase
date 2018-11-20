@@ -1,6 +1,23 @@
 class MathUtil {
+    static deg2rad = Math.PI / 180
+    static rad2deg = 180 / Math.PI
+
     static mag(x0: number, y0: number, x1: number, y1: number) {
         return Math.sqrt((x0 - x1) * (x0 - x1) + (y0 - y1) * (y0 - y1))
+    }
+
+    // 两个向量的角度（弧度值）
+    static getAngle(x1: number, y1: number, x2: number, y2: number) {
+        let len1 = Math.sqrt(x1 * x1 + y1 * y1)
+        let len2 = Math.sqrt(x2 * x2 + y2 * y2)
+        return Math.acos((x1 * x2 + y1 * y2) / (len1 * len2))
+    }
+
+    // 旋转向量
+    static rotate(x: number, y: number, radAngle: number) {
+        let cos = Math.cos(radAngle)
+        let sin = Math.sin(radAngle)
+        return new Laya.Point(x * cos - y * sin, x * sin + y * cos)
     }
 
     static line(x0: number, y0: number, x1: number, y1: number, cb: (x: number, y: number) => void) {

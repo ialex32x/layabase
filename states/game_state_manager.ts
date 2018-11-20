@@ -27,6 +27,13 @@ class GameStateManager {
         }
     }
 
+    top() {
+        let size = this._states.length
+        if (size > 1) {
+            return this._states[size - 1]
+        }
+    }
+
     pop() {
         let size = this._states.length
         if (size > 1) {
