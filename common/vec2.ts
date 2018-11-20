@@ -42,9 +42,9 @@ class Vec2 {
         return Math.sqrt(this.x * this.x + this.y * this.y)
     }
 
-    rotate(radAngle: number) {
-        let cos = Math.cos(radAngle)
-        let sin = Math.sin(radAngle)
+    rotate(radian: number) {
+        let cos = Math.cos(radian)
+        let sin = Math.sin(radian)
         this.x = this.x * cos - this.y * sin
         this.y = this.x * sin + this.y * cos
         return this
@@ -102,9 +102,9 @@ class Vec2 {
         return a.x * b.x + a.y * b.y
     }
 
-    static rotate(vec: Vec2, radAngle: number) {
-        let cos = Math.cos(radAngle)
-        let sin = Math.sin(radAngle)
+    static rotate(vec: Vec2, radian: number) {
+        let cos = Math.cos(radian)
+        let sin = Math.sin(radian)
         return new Vec2(
             vec.x * cos - vec.y * sin,
             vec.x * sin + vec.y * cos
@@ -113,6 +113,16 @@ class Vec2 {
 
     angle(v2: Vec2) {
         return Math.atan2(this.cross(v2), this.dot(v2))
+    }
+
+    slerp(v2: Vec2, p: number) {
+        let theta = this.angle(v2)
+        return Vec2.rotate(this, p)
+    }
+
+    static slerp(v1:Vec2, v2: Vec2, p: number) {
+        let theta = v1.angle(v2)
+        return Vec2.rotate(v1, theta * p)
     }
 
     static angle(v1: Vec2, v2: Vec2) {
