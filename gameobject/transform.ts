@@ -5,6 +5,11 @@ class Transform extends BaseComponent {
     private _node: Laya.Sprite = null
     private _changed = false
 
+    private _pos = new Vec2()
+
+    private _globalValid = false
+    // private _globalMatrix
+
     get sprite() {
         return this._node
     }
@@ -33,12 +38,12 @@ class Transform extends BaseComponent {
         return this._changed
     }
 
-    get localX() {
-        return this._node.x
+    get x() {
+        return this._pos.x
     }
 
-    get localY() {
-        return this._node.y
+    get y() {
+        return this._pos.y
     }
 
     get scaleX() {
@@ -49,22 +54,25 @@ class Transform extends BaseComponent {
         return this._node.scaleY
     }
 
-    get localPosition() {
-        return new Laya.Point(this._node.x, this._node.y)
+    get position() {
+        return this._pos
     }
 
-    set localPosition(pos: Laya.Point) {
+    set position(pos: Vec2) {
+        this._pos.set(pos.x, pos.y)
         this._node.pos(pos.x, pos.y)
         this._changed = true
     }
 
     // 移动指定位置
     translate(ox: number, oy: number) {
-        this._node.pos(this._node.x + ox, this._node.y + oy)
+        this._pos.translate(ox, oy)
+        this._node.pos(this._pos.x + ox, this._pos.y + oy)
         this._changed = true
     }
 
-    setLocalPosition(x: number, y: number) {
+    setPosition(x: number, y: number) {
+        this._pos.set(x, y)
         this._node.pos(x, y)
         this._changed = true
     }

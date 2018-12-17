@@ -23,6 +23,11 @@ class Vec2 {
         this.y = y
     }
 
+    translate(x: number, y: number) {
+        this.x += x
+        this.y += y
+    }
+
     clone() {
         return new Vec2(this.x, this.y)
     }
@@ -42,12 +47,10 @@ class Vec2 {
         return Math.sqrt(this.x * this.x + this.y * this.y)
     }
 
-    rotate(radian: number) {
-        let cos = Math.cos(radian)
-        let sin = Math.sin(radian)
-        this.x = this.x * cos - this.y * sin
-        this.y = this.x * sin + this.y * cos
-        return this
+    static distance(v1: Vec2, v2: Vec2) {
+        let dx = v1.x - v2.x
+        let dy = v1.y - v2.y
+        return Math.sqrt(dx * dx + dy * dy)
     }
 
     zero() {
@@ -102,6 +105,14 @@ class Vec2 {
         return a.x * b.x + a.y * b.y
     }
 
+    rotate(radian: number) {
+        let cos = Math.cos(radian)
+        let sin = Math.sin(radian)
+        this.x = this.x * cos - this.y * sin
+        this.y = this.x * sin + this.y * cos
+        return this
+    }
+
     static rotate(vec: Vec2, radian: number) {
         let cos = Math.cos(radian)
         let sin = Math.sin(radian)
@@ -115,12 +126,20 @@ class Vec2 {
         return Math.atan2(this.cross(v2), this.dot(v2))
     }
 
+    lerp(v2: Vec2, p: number) {
+        return new Vec2(MathUtil.lerp(this.x, v2.x, p), MathUtil.lerp(this.y, v2.y, p))
+    }
+
+    static lerp(v1: Vec2, v2: Vec2, p: number) {
+        return new Vec2(MathUtil.lerp(v1.x, v2.x, p), MathUtil.lerp(v1.y, v2.y, p))
+    }
+
     slerp(v2: Vec2, p: number) {
         let theta = this.angle(v2)
         return Vec2.rotate(this, p)
     }
 
-    static slerp(v1:Vec2, v2: Vec2, p: number) {
+    static slerp(v1: Vec2, v2: Vec2, p: number) {
         let theta = v1.angle(v2)
         return Vec2.rotate(v1, theta * p)
     }
@@ -133,8 +152,24 @@ class Vec2 {
         return new Vec2(a.x + b.x, a.y + b.y)
     }
 
+    static addXY(a: Vec2, x: number, y: number): Vec2 {
+        return new Vec2(a.x + x, a.y + y)
+    }
+
+    static addY(a: Vec2, y: number): Vec2 {
+        return new Vec2(a.x, a.y + y)
+    }
+
     static sub(a: Vec2, b: Vec2): Vec2 {
         return new Vec2(a.x - b.x, a.y - b.y)
+    }
+
+    static subXY(a: Vec2, x: number, y: number): Vec2 {
+        return new Vec2(a.x - x, a.y - y)
+    }
+
+    static subY(a: Vec2, y: number): Vec2 {
+        return new Vec2(a.x, a.y - y)
     }
 
     static mul(a: Vec2, b: number): Vec2 {

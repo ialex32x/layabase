@@ -1,6 +1,11 @@
 class MathUtil {
-    static deg2rad = Math.PI / 180
-    static rad2deg = 180 / Math.PI
+    static readonly PI2 = Math.PI * 2
+    static readonly deg2rad = Math.PI / 180
+    static readonly rad2deg = 180 / Math.PI
+
+    static randrange(a: number, b: number) {
+        return a < b ? Math.random() * (b - a) + a : Math.random() * (a - b) + b
+    }
 
     static mag(x0: number, y0: number, x1: number, y1: number) {
         return Math.sqrt((x0 - x1) * (x0 - x1) + (y0 - y1) * (y0 - y1))
