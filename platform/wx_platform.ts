@@ -1,20 +1,47 @@
 
 
 class WxPlatform extends BasePlatform {
-    init() {
+    init(cb: Function) {
         //初始化微信小游戏
         Laya.MiniAdpter.init()
         Laya.MiniAdpter["getUrlEncode"] = WxPlatform.getUrlAndEncode
         this._storage = new WeixinStorageBackend()
         this._fs = new WeixinFileSystemBackend()
-        wx.onHide(() => {
-            console.log("onhide")
-        })
         let opts = wx.getLaunchOptionsSync()
-        console.log("launch", opts)
+        // 启动传参
+        this._env.query = opts.query
+        // console.log("launch", opts)
+
         wx.onShow(res => {
-            console.log("onshow", res)
+            // console.log("onshow", res)
+            this._env.query = res.query
+            this.dispatch("onShow")
         })
+        wx.onHide(() => {
+            // console.log("onhide")
+            this.dispatch("onHide")
+        })
+
+        this._env.systemInfo = wx.getSystemInfoSync()
+        wx.getUpdateManager().onCheckForUpdate(res => {
+            console.log("check for update:", res.hasUpdate)
+        })
+        wx.getUpdateManager().onUpdateFailed(() => {
+            console.log("check for update: failed")
+        })
+        wx.getUpdateManager().onUpdateReady(() => {
+            wx.showModal({
+                title: "更新提示",
+                content: "有更新版本可用并已经准备好，是否重启应用？",
+                // showCancel: false,
+                success: res => {
+                    if (res.confirm) {
+                        wx.getUpdateManager().applyUpdate()
+                    }
+                }
+            })
+        })
+        cb()
     }
 
     static getUrlAndEncode(url: string, type: string): string {
@@ -32,69 +59,71 @@ class WxPlatform extends BasePlatform {
         wx.exitMiniProgram()
     }
 
-    /*
-    let button = wx.createUserInfoButton({
-        type: 'text',
-        text: '获取用户信息',
-        style: {
-            left: 10,
-            top: 76,
-            width: 200,
-            height: 40,
-            lineHeight: 40,
-            backgroundColor: '#ff0000',
-            color: '#ffffff',
-            textAlign: 'center',
-            fontSize: 16,
-            borderRadius: 4
-        }
-    })
-    button.onTap((res) = > {
-        console.log(res)
-    })
-     */
-    login(cb: (status: boolean, res?: any) => void) {
+    login(cb: (status: boolean, errMsg?: string) => void) {
         wx.login({
             timeout: 5000,
             success: res => {
                 let code = res.code
-                wx.authorize({
-                    scope: "scope.userInfo",
-                    success: () => {
-                        wx.getUserInfo({
-                            success: res => {
-                                let photo = res.userInfo.avatarUrl
-                                console.log("wx.getUserInfo", photo, res.userInfo)
-                                HttpRequest.GET("/colors/game/login", {
-                                    platform: myAppConfig.platform,
-                                    photo: photo,
-                                    code: code,
-                                }, (status, res) => {
-                                    if (status) {
-                                        if (res.status == 0) {
-                                            cb(true, res)
-                                        } else {
-                                            cb(false, "reject")
-                                        }
-                                    } else {
-                                        cb(false, "timeout")
-                                    }
-                                })
-                            },
-                            fail: () => {
-                                cb(false, "getUserInfo failed")
-                            },
-                        })
-                    },
-                    fail: () => {
-                        cb(false, "no auth")
-                    },
-                })
+                this._userInfo.code = code
+                console.log("wx.login", code)
+                this.getUserInfo(cb)
             },
             fail: res => {
                 cb(false, "fail")
             }
         })
+    }
+
+    // 获取用户信息，如果未授权，则创建按钮请求授权
+    private getUserInfo(cb: (success: boolean, errMsg?: string) => void) {
+        wx.getSetting({
+            success: res => {
+                if (res.authSetting["scope.userInfo"]) {
+                    // 已经授权
+                    wx.getUserInfo({
+                        success: res => {
+                            console.log("wx.getUserInfo = ", res.userInfo)
+                            this.setUserInfo(res.userInfo)
+                            cb(true)
+                        },
+                        fail: () => {
+                            cb(false, "wx.getUserInfo fail")
+                        }
+                    })
+                } else {
+                    // 未授权
+                    if (!this._env["userInfoButtonDef"]) {
+                        cb(false, "no env.userInfoButtonDef")
+                    } else {
+                        let button = wx.createUserInfoButton(this._env["userInfoButtonDef"])
+                        console.log("wx.createUserInfoButton", this._env["userInfoButtonDef"])
+                        console.log("button object", button)
+                        button.onTap(res => {
+                            console.log("userInfoButton.tap: res = ", res.userInfo)
+                            if (this.setUserInfo(res.userInfo)) {
+                                cb(true)
+                                button.destroy()
+                            } else {
+                                cb(false, "userInfoButton tap: rejected")
+                            }
+                        })
+                        button.show()
+                    }
+                }
+            },
+            fail: () => {
+                cb(false, "wx.getSetting fail")
+            }
+        })
+    }
+
+    private setUserInfo(userInfo: WXUserInfoObject) {
+        if (!!userInfo) {
+            this._userInfo.name = userInfo.nickName
+            this._userInfo.photo = userInfo.avatarUrl
+            return true
+        }
+        return false
     }
 
     share(title: string, imageUrl: string, payload?: any, cb?: (status: boolean) => void) {
@@ -113,6 +142,28 @@ class WxPlatform extends BasePlatform {
                 }
             }
         })
+    }
 
+    prompt(title: string, text: string, buttonText: string, cb: Function) {
+        wx.showModal({
+            title: title,
+            content: text,
+            confirmText: buttonText,
+            showCancel: false,
+            cancelText: "cancel",
+            success: res => {
+                cb()
+            },
+        })
+    }
+
+    showLoading(title?: string) {
+        wx.showLoading({
+            title: title || "加载中"
+        })
+    }
+
+    hideLoading() {
+        wx.hideLoading()
     }
 }

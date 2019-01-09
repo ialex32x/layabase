@@ -1,15 +1,16 @@
 class NullPlatform extends BasePlatform {
-    init() {
+    init(cb: Function) {
         console.log("null platform init")
         this._storage = Laya.LocalStorage.support ? new LocalStorageBackend() : new StorageBackend()
         this._fs = new NullFileSystemBackend()
+        cb()
     }
 
     exit() {
         console.log("null platform exit")
     }
 
-    login(cb: (status: boolean, res?: any) => void) {
+    login(cb: (status: boolean, errMsg?: string) => void) {
         cb(true)
     }
 
@@ -18,5 +19,10 @@ class NullPlatform extends BasePlatform {
         if (!!cb) {
             cb(true)
         }
+    }
+
+    prompt(title: string, text: string, buttonText: string, cb: Function) {
+        console.log(title, text, buttonText)
+        cb()
     }
 }

@@ -19,7 +19,7 @@ class GameStateManager {
                 this._states.splice(index, 1)
                 state.visible = false
                 state.destroy()
-                if (index == size - 1) {
+                if (index == size - 1 && index > 0) {
                     this._states[index - 1].visible = true
                 }
                 return state
