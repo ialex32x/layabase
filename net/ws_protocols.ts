@@ -19,11 +19,10 @@ class CProtocols {
     static magic: number
     static maxPayloadSize: number 
     private static _id2tp = []
-    private static _tp2id = []
 
     static register(msg_id: number, msg_type: any) {
         this._id2tp[msg_id] = msg_type
-        this._tp2id[msg_type] = msg_id
+        Object.defineProperty(msg_type, "msg_id", { value: msg_id })
     }
 
     static writer = protobuf.Writer.create()
@@ -44,16 +43,18 @@ class CProtocols {
 
     static serialize(msg) {
         let msg_type = Object.getPrototypeOf(msg).constructor
-        if (msg_type) {
-            let id = this._tp2id[msg_type]
-            // let writer = protobuf.Writer.create()
-            let writer = this.writer
-            writer.fixed32(0) // msg id stub
-            msg_type.encode(msg, writer)
-            let payload = writer.finish()
-            this.writeUintBE(id, payload, 0)
-            writer.reset()
-            return payload.buffer.slice(payload.byteOffset, payload.byteOffset + payload.byteLength)
+        if (!!msg_type) {
+            let id = msg_type.msg_id
+            if (!!id) {
+                // let writer = protobuf.Writer.create()
+                let writer = this.writer
+                writer.fixed32(0) // msg id stub
+                msg_type.encode(msg, writer)
+                let payload = writer.finish()
+                this.writeUintBE(id, payload, 0)
+                writer.reset()
+                return payload.buffer.slice(payload.byteOffset, payload.byteOffset + payload.byteLength)
+            }
         }
     }
 

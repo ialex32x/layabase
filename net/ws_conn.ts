@@ -4,9 +4,8 @@ class WSConnection {
     public static readonly EVT_OPEN = "open"
     public static readonly EVT_ERROR = "error"
 
-    private url: string
     private socket: Laya.Socket
-    // private byte: Laya.Byte
+    private byte: Laya.Byte
     private packet: IWSPacket = {}
 
     protected events = new Laya.EventDispatcher()
@@ -22,12 +21,8 @@ class WSConnection {
         return this.socket && this.socket.connected
     }
 
-    constructor(url: string) {
-        this.url = url
-        // this.byte = new Laya.Byte() 
-        // this.byte.endian = Laya.Byte.BIG_ENDIAN 
+    constructor() {
         this.socket = new Laya.Socket()
-        this.socket.endian = Laya.Byte.LITTLE_ENDIAN
         this.socket.on(Laya.Event.OPEN, this, this._onopen)
         this.socket.on(Laya.Event.MESSAGE, this, this._onmessage)
         this.socket.on(Laya.Event.CLOSE, this, this._onclose)
@@ -37,8 +32,7 @@ class WSConnection {
     // 发起连接
     // "ws://localhost:8080/echo"
     connect(url: string) {
-        this.url = url;
-        this.socket.connectByUrl(this.url)
+        this.socket.connectByUrl(url)
     }
 
     close() {
@@ -101,16 +95,23 @@ class WSConnection {
 
     _dispatch(msg: any) {
         if (msg) {
-            let handler = this.msghandlers[Object.getPrototypeOf(msg).constructor]
-            if (handler) {
-                handler(msg)
+            let msg_type = Object.getPrototypeOf(msg).constructor
+            if (msg_type) {
+                let handler = this.msghandlers[msg_type.msg_id]
+                if (handler) {
+                    handler(msg)
+                }
             }
         }
     }
 
     on<T>(type: { new (): T }, fn: (msg: T) => void) {
         let tp: any = type
-        this.msghandlers[tp] = fn
+        if (!tp.msg_id) {
+            console.error("invalid msg object", tp)
+            throw new Error("type error")
+        }
+        this.msghandlers[tp.msg_id] = fn
         return this
     }
 
